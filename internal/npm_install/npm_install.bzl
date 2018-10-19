@@ -177,6 +177,10 @@ def _yarn_install_impl(repository_ctx):
     repository_ctx.path("_yarn_cache"),
     "--cwd",
     repository_ctx.path(""),
+    # This configuration is personal, the default yarn registry is
+    # https://registry.yarnpkg.com.
+    "--registry",
+    "http://yarn.corp.logiocean.com:4873",
   ]
 
   if repository_ctx.attr.prod_only:
