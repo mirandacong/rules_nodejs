@@ -41,6 +41,8 @@ var BOOTSTRAP = [TEMPLATED_bootstrap];
 
 const USER_WORKSPACE_NAME = 'TEMPLATED_user_workspace_name';
 const NODE_MODULES_ROOT = 'TEMPLATED_node_modules_root';
+const BIN_DIR = 'TEMPLATED_bin_dir';
+const GEN_DIR = 'TEMPLATED_gen_dir';
 
 if (DEBUG)
   console.error(`
@@ -48,6 +50,8 @@ node_loader: running TEMPLATED_target with
   MODULE_ROOTS: ${JSON.stringify(MODULE_ROOTS, undefined, 2)}
   BOOTSTRAP: ${JSON.stringify(BOOTSTRAP, undefined, 2)}
   NODE_MODULES_ROOT: ${NODE_MODULES_ROOT}
+  BIN_DIR: ${BIN_DIR}
+  GEN_DIR: ${GEN_DIR}
 `);
 
 function resolveToModuleRoot(path) {
@@ -84,18 +88,49 @@ function resolveToModuleRoot(path) {
  */
 function loadRunfilesManifest(manifestPath) {
   if (DEBUG) console.error(`node_loader: using manifest ${manifestPath}`);
+
+  // Create the manifest and reverse manifest maps.
   const runfilesManifest = Object.create(null);
   const reverseRunfilesManifest = Object.create(null);
   const input = fs.readFileSync(manifestPath, {encoding: 'utf-8'});
+  let workspaceRoot;
   for (const line of input.split('\n')) {
     if (!line) continue;
     const [runfilesPath, realPath] = line.split(' ');
     runfilesManifest[runfilesPath] = realPath;
     reverseRunfilesManifest[realPath] = runfilesPath;
+
+    // Determine workspace root to convert absolute paths into runfile paths.
+    // This only works if there is at least one runfile in the workspace root, but that is
+    // also the only case when we need to map back to the runfiles.
+    // See https://github.com/bazelbuild/bazel/issues/5926 for more information.
+    if (!workspaceRoot && runfilesPath.startsWith(USER_WORKSPACE_NAME) 
+        && !runfilesPath.startsWith(`${USER_WORKSPACE_NAME}/external/`) ) {
+
+      // Plus one to include the slash at the end.
+      const runfilesPathRemainder = runfilesPath.slice(USER_WORKSPACE_NAME.length + 1);
+      if (realPath.endsWith(runfilesPathRemainder)) {
+        workspaceRoot = realPath.slice(0, realPath.length - runfilesPathRemainder.length);
+      }
+    }
   }
-  return {runfilesManifest, reverseRunfilesManifest};
+
+  // Determine bin and gen root to convert absolute paths into runfile paths.
+  const binRootIdx = manifestPath.indexOf(BIN_DIR);
+  let binRoot, genRoot;
+  if (binRootIdx !== -1) {
+    const execRoot = manifestPath.slice(0, binRootIdx);
+    binRoot = `${execRoot}${BIN_DIR}/`;
+    genRoot = `${execRoot}${GEN_DIR}/`;
+  }
+
+  if (DEBUG) console.error(`node_loader: using binRoot ${binRoot}`);
+  if (DEBUG) console.error(`node_loader: using genRoot ${genRoot}`);
+  if (DEBUG) console.error(`node_loader: using workspaceRoot ${workspaceRoot}`);
+
+  return { runfilesManifest, reverseRunfilesManifest, binRoot, genRoot, workspaceRoot };
 }
-const { runfilesManifest, reverseRunfilesManifest } =
+const { runfilesManifest, reverseRunfilesManifest, binRoot, genRoot, workspaceRoot } =
     // On Windows, Bazel sets RUNFILES_MANIFEST_ONLY=1.
     // On every platform, Bazel also sets RUNFILES_MANIFEST_FILE, but on Linux
     // and macOS it's faster to use the symlinks in RUNFILES_DIR rather than resolve
@@ -111,6 +146,20 @@ function isFile(res) {
   } catch (e) {
     return false;
   }
+}
+
+function isDirectory(res) {
+  try {
+    return fs.statSync(res).isDirectory();
+  } catch (e) {
+    return false;
+  }
+}
+
+function readDir(dir) {
+  return fs.statSync(dir).isDirectory() ?
+      Array.prototype.concat(...fs.readdirSync(dir).map(f => readDir(path.join(dir, f)))) :
+      dir.replace(/\\/g, '/');
 }
 
 function loadAsFileSync(res) {
@@ -151,7 +200,29 @@ function loadAsDirectorySync(res) {
 }
 
 function resolveManifestFile(res) {
-  return runfilesManifest[res] || runfilesManifest[res + '.js'];
+  const maybe = runfilesManifest[res] || runfilesManifest[res + '.js'];
+  if (maybe) {
+    return maybe;
+  }
+  // Look for tree artifacts that match and update
+  // the runfiles with files that are in the tree artifact.
+  // Attempt to resolve again with the updated runfiles
+  // if a tree artifact matched.
+  let segments = res.split('/');
+  segments.pop();
+  while (segments.length) {
+    const test = segments.join('/');
+    const tree = runfilesManifest[test];
+    if (tree && isDirectory(tree)) {
+      // We have a tree artifact that matches
+      const files = readDir(tree).map(f => path.relative(tree, f).replace(/\\/g, '/'));
+      files.forEach(f => {
+        runfilesManifest[path.posix.join(test, f)] = path.posix.join(tree, f);
+      })
+      return runfilesManifest[res] || runfilesManifest[res + '.js'];
+    }
+    segments.pop();
+  }
 }
 
 function resolveManifestDirectory(res) {
@@ -188,18 +259,32 @@ function resolveRunfiles(parent, ...pathSegments) {
   const defaultPath = path.join(process.env.RUNFILES, ...pathSegments);
 
   if (runfilesManifest) {
-    // Resolve relative paths from manifest files.
-    if (parent && pathSegments[0] && pathSegments[0].startsWith('.')) {
+    // Normalize to forward slash, because even on Windows the runfiles_manifest file
+    // is written with forward slash.
+    let runfilesEntry = pathSegments.join('/').replace(/\\/g, '/');
+
+    if (parent && runfilesEntry.startsWith('.')) {
+      // Resolve relative paths from manifest files.
       const normalizedParent = parent.replace(/\\/g, '/');
       const parentRunfile = reverseRunfilesManifest[normalizedParent];
       if (parentRunfile) {
-        pathSegments = [path.dirname(parentRunfile), ...pathSegments];
+        runfilesEntry = path.join(path.dirname(parentRunfile), runfilesEntry);
       }
+    } else if (runfilesEntry.startsWith(binRoot) || runfilesEntry.startsWith(genRoot)
+        || runfilesEntry.startsWith(workspaceRoot)) {
+      // For absolute paths, replace binRoot, genRoot or workspaceRoot with USER_WORKSPACE_NAME 
+      // to enable lookups.
+      // It's OK to do multiple replacements because all of these are absolute paths with drive
+      // names (e.g. C:\), and on Windows you can't have drive names in the middle of paths.
+      runfilesEntry = runfilesEntry
+        .replace(binRoot, `${USER_WORKSPACE_NAME}/`)
+        .replace(genRoot, `${USER_WORKSPACE_NAME}/`)
+        .replace(workspaceRoot, `${USER_WORKSPACE_NAME}/`);       
     }
 
-    // Normalize to forward slash, because even on Windows the runfiles_manifest file
-    // is written with forward slash.
-    const runfilesEntry = path.join(...pathSegments).replace(/\\/g, '/');
+    // Normalize and replace path separators to conform to the ones in the manifest.
+    runfilesEntry = path.normalize(runfilesEntry).replace(/\\/g, '/');
+
     if (DEBUG) console.error('node_loader: try to resolve in runfiles manifest', runfilesEntry);
 
     let maybe = resolveManifestFile(runfilesEntry);
@@ -353,7 +438,7 @@ module.constructor._resolveFilename = function(request, parent) {
   }
 
   const error = new Error(
-      `TEMPLATED_target cannot find module '${request}'\n  looked in:` +
+      `TEMPLATED_target cannot find module '${request}' required by '${parentFilename}'\n  looked in:` +
       failedResolutions.map(r => `\n   ${r}\n`));
   error.code = 'MODULE_NOT_FOUND';
   throw error;
@@ -389,7 +474,20 @@ if (require.main === module) {
   try {
     module.constructor._load(mainScript, this, /*isMain=*/true);
   } catch (e) {
-    console.error('failed to load main ', e.stack || e);
+    console.error(e.stack || e);
+    if (NODE_MODULES_ROOT === 'build_bazel_rules_nodejs/node_modules') {
+      // This error is possibly due to a breaking change in 0.13.0 where
+      // the default node_modules attribute of nodejs_binary was changed
+      // from @//:node_modules to @build_bazel_rules_nodejs//:node_modules_none
+      // (which is an empty filegroup).
+      // See https://github.com/bazelbuild/rules_nodejs/wiki#migrating-to-rules_nodejs-013
+      console.error(
+          `\nWARNING: Due to a breaking change in rules_nodejs 0.13.0, target TEMPLATED_target\n` +
+          `must now declare either an explicit node_modules attribute, or\n` +
+          `list explicit deps[] or data[] fine grained dependencies on npm labels\n` +
+          `if it has any node_modules dependencies.\n` +
+          `See https://github.com/bazelbuild/rules_nodejs/wiki#migrating-to-rules_nodejs-013\n`);
+    }
     process.exit(1);
   }
 }
