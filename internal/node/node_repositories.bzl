@@ -30,10 +30,26 @@ DEFAULT_YARN_VERSION = "1.3.2"
 
 # Dictionary mapping NodeJS versions to sets of hosts and their correspoding (filename, strip_prefix, sha256) tuples.
 NODE_REPOSITORIES = {
+  # 10.10.0
+  "10.10.0-darwin_amd64": ("node-v10.10.0-darwin-x64.tar.gz", "node-v10.10.0-darwin-x64", "00b7a8426e076e9bf9d12ba2d571312e833fe962c70afafd10ad3682fdeeaa5e"),
+  "10.10.0-linux_amd64": ("node-v10.10.0-linux-x64.tar.xz", "node-v10.10.0-linux-x64", "686d2c7b7698097e67bcd68edc3d6b5d28d81f62436c7cf9e7779d134ec262a9"),
+  "10.10.0-windows_amd64": ("node-v10.10.0-win-x64.zip", "node-v10.10.0-win-x64", "70c46e6451798be9d052b700ce5dadccb75cf917f6bf0d6ed54344c856830cfb"),
+  # 10.9.0
+  "10.9.0-darwin_amd64": ("node-v10.9.0-darwin-x64.tar.gz", "node-v10.9.0-darwin-x64", "3c4fe75dacfcc495a432a7ba2dec9045cff359af2a5d7d0429c84a424ef686fc"),
+  "10.9.0-linux_amd64": ("node-v10.9.0-linux-x64.tar.xz", "node-v10.9.0-linux-x64", "c5acb8b7055ee0b6ac653dc4e458c5db45348cecc564b388f4ed1def84a329ff"),
+  "10.9.0-windows_amd64": ("node-v10.9.0-win-x64.zip", "node-v10.9.0-win-x64", "6a75cdbb69d62ed242d6cbf0238a470bcbf628567ee339d4d098a5efcda2401e"),
+  # 10.3.0
+  "10.3.0-darwin_amd64": ("node-v10.3.0-darwin-x64.tar.gz", "node-v10.3.0-darwin-x64", "0bb5b7e3fe8cccda2abda958d1eb0408f1518a8b0cb58b75ade5d507cd5d6053"),
+  "10.3.0-linux_amd64": ("node-v10.3.0-linux-x64.tar.xz", "node-v10.3.0-linux-x64", "eb3c3e2585494699716ad3197c8eedf4003d3f110829b30c5a0dc34414c47423"),
+  "10.3.0-windows_amd64": ("node-v10.3.0-win-x64.zip", "node-v10.3.0-win-x64", "65d586afb087406a2800d8e51f664c88b26d510f077b85a3b177a1bb79f73677"),
   # 9.11.1
   "9.11.1-darwin_amd64": ("node-v9.11.1-darwin-x64.tar.gz", "node-v9.11.1-darwin-x64", "7b1fb394aa41a62b477e36df16644bd383cc9084808511f6cd318b835a06aac6"),
   "9.11.1-linux_amd64": ("node-v9.11.1-linux-x64.tar.xz", "node-v9.11.1-linux-x64", "4d27a95d5c2f1c8ef99118794c9c4903e63963418d3e16ca7576760cff39879b"),
   "9.11.1-windows_amd64": ("node-v9.11.1-win-x64.zip", "node-v9.11.1-win-x64", "0a3566d57ccb7fed95d18fc6c3bc1552a1b1e4753f9bc6c5d45e04f325e1ee53"),
+  # 8.12.0
+  "8.12.0-darwin_amd64": ("node-v8.12.0-darwin-x64.tar.gz", "node-v8.12.0-darwin-x64", "ca131b84dfcf2b6f653a6521d31f7a108ad7d83f4d7e781945b2eca8172064aa"),
+  "8.12.0-linux_amd64": ("node-v8.12.0-linux-x64.tar.xz", "node-v8.12.0-linux-x64", "29a20479cd1e3a03396a4e74a1784ccdd1cf2f96928b56f6ffa4c8dae40c88f2"),
+  "8.12.0-windows_amd64": ("node-v8.12.0-win-x64.zip", "node-v8.12.0-win-x64", "9b22c9b23148b61ea0052826b3ac0255b8a3a542c125272b8f014f15bf11b091"),
   # 8.11.1
   "8.11.1-darwin_amd64": ("node-v8.11.1-darwin-x64.tar.gz", "node-v8.11.1-darwin-x64", "5c7b05899ff56910a2b8180f139d48612f349ac2c5d20f08dbbeffbed9e3a089"),
   "8.11.1-linux_amd64": ("node-v8.11.1-linux-x64.tar.xz", "node-v8.11.1-linux-x64", "6617e245fa0f7fbe0e373e71d543fea878315324ab31dc64b4eba10e42d04c11"),
@@ -46,6 +62,8 @@ NODE_REPOSITORIES = {
 
 # Dictionary mapping Yarn versions to their correspoding (filename, strip_prefix, sha256) tuples.
 YARN_REPOSITORIES = {
+  "1.9.4": ("yarn-v1.9.4.tar.gz", "yarn-v1.9.4", "7667eb715077b4bad8e2a832e7084e0e6f1ba54d7280dc573c8f7031a7fb093e"),
+  "1.9.2": ("yarn-v1.9.2.tar.gz", "yarn-v1.9.2", "3ad69cc7f68159a562c676e21998eb21b44138cae7e8fe0749a7d620cf940204"),
   "1.6.0": ("yarn-v1.6.0.tar.gz", "yarn-v1.6.0", "a57b2fdb2bfeeb083d45a883bc29af94d5e83a21c25f3fc001c295938e988509"),
   "1.5.1": ("yarn-v1.5.1.tar.gz", "yarn-v1.5.1", "cd31657232cf48d57fdbff55f38bfa058d2fb4950450bd34af72dac796af4de1"),
   "1.3.2": ("yarn-v1.3.2.tar.gz", "yarn-v1.3.2", "6cfe82e530ef0837212f13e45c1565ba53f5199eec2527b85ecbcd88bf26821d"),
@@ -63,6 +81,20 @@ YARN_URLS = [
 
 NODE_DIR = "bin/nodejs"
 YARN_DIR= "bin/yarnpkg"
+
+GET_SCRIPT_DIR = """
+# From stackoverflow.com
+SOURCE="${BASH_SOURCE[0]}"
+# Resolve $SOURCE until the file is no longer a symlink
+while [ -h "$SOURCE" ]; do
+  DIR="$(cd -P "$(dirname "$SOURCE" )" >/dev/null && pwd)"
+  SOURCE="$(readlink "$SOURCE")"
+  # if $SOURCE was a relative symlink, we need to resolve it relative to the
+  # path where the symlink file was located.
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+SCRIPT_DIR="$(cd -P "$( dirname "$SOURCE" )" >/dev/null && pwd)"
+"""
 
 # def _write_node_modules_impl(repository_ctx):
   # WORKAROUND for https://github.com/bazelbuild/bazel/issues/374#issuecomment-296217940
@@ -88,7 +120,7 @@ def _download_node(repository_ctx):
   Args:
     repository_ctx: The repository rule context
   """
-  if repository_ctx.attr.node_path != "":
+  if repository_ctx.attr.vendored_node:
     return
 
   host = os_name(repository_ctx)
@@ -116,7 +148,7 @@ def _download_yarn(repository_ctx):
   Args:
     repository_ctx: The repository rule context
   """
-  if repository_ctx.attr.yarn_path != "":
+  if repository_ctx.attr.vendored_yarn:
     return
 
   yarn_version = repository_ctx.attr.yarn_version
@@ -149,12 +181,39 @@ def _prepare_node(repository_ctx):
     repository_ctx: The repository rule context
   """
   is_windows = os_name(repository_ctx).find("windows") != -1
-  node_exec = "{}/bin/node".format(NODE_DIR) if not is_windows else "{}/node.exe".format(NODE_DIR)
-  npm_script = "{}/bin/npm".format(NODE_DIR) if not is_windows else "{}/node_modules/npm/bin/npm-cli.js".format(NODE_DIR)
-  yarn_script = "{}/bin/yarn.js".format(YARN_DIR)
+  if repository_ctx.attr.vendored_node:
+    node_exec = "/".join([f for f in [
+        "../../..",
+        repository_ctx.attr.vendored_node.workspace_root,
+        repository_ctx.attr.vendored_node.package,
+        repository_ctx.attr.vendored_node.name,
+        "bin/node" if not is_windows else "node.exe"] if f])
+    npm_script = "/".join([f for f in [
+        "../../..",
+        repository_ctx.attr.vendored_node.workspace_root,
+        repository_ctx.attr.vendored_node.package,
+        repository_ctx.attr.vendored_node.name,
+        "bin/npm" if not is_windows else "node_modules/npm/bin/npm-cli.js"] if f])
+    yarn_script = "/".join([f for f in [
+        "../../..",
+        repository_ctx.attr.vendored_yarn.workspace_root,
+        repository_ctx.attr.vendored_yarn.package,
+        repository_ctx.attr.vendored_yarn.name,
+        "bin/yarn.js"] if f])
+  else:
+    node_exec = "{}/bin/node".format(NODE_DIR) if not is_windows else "{}/node.exe".format(NODE_DIR)
+    npm_script = "{}/bin/npm".format(NODE_DIR) if not is_windows else "{}/node_modules/npm/bin/npm-cli.js".format(NODE_DIR)
+    yarn_script = "{}/bin/yarn.js".format(YARN_DIR)
   node_entry = "bin/node" if not is_windows else "bin/node.cmd"
   npm_node_repositories_entry = "bin/npm_node_repositories" if not is_windows else "bin/npm_node_repositories.cmd"
   yarn_node_repositories_entry = "bin/yarn_node_repositories" if not is_windows else "bin/yarn_node_repositories.cmd"
+
+  node_exec_relative = node_exec if repository_ctx.attr.vendored_node else paths.relativize(node_exec, "bin")
+  npm_script_relative = npm_script if repository_ctx.attr.vendored_node else paths.relativize(npm_script, "bin")
+  yarn_script_relative = yarn_script if repository_ctx.attr.vendored_yarn else paths.relativize(yarn_script, "bin")
+
+  if not repository_ctx.attr.preserve_symlinks:
+    print("\nWARNING: The preserve_symlinks option is deprecated and will go away in the future.\n")
 
   # Base build file for this repository - exposes the node runtime and utilities generated below.
   repository_ctx.file("BUILD.bazel", content="""#Generated by node_repositories.bzl
@@ -189,6 +248,10 @@ filegroup(
     exclude = [
       "**/*.md",
       "**/*.html",
+      # These files are generated during node-gyp compilation and include
+      # absolute paths, making them non-hermetic.
+      # See https://github.com/bazelbuild/rules_nodejs/issues/347
+      "**/*.pyc",
     ],
   ),
 )
@@ -215,20 +278,21 @@ proc.on('close', (code) => { process.exit(code); });
     # Sets PATH and runs bin/node.js passing all arguments
     repository_ctx.file("bin/node", content="""#!/bin/bash
 #Generated by node_repositories.bzl
-CUR_DIR=$(dirname ${{BASH_SOURCE[0]}})
-export PATH="$CUR_DIR":$PATH
-"$CUR_DIR/{node}" "$CUR_DIR/{script}" "$CUR_DIR" "$@"
+{get_script_dir}
+export PATH="$SCRIPT_DIR":$PATH
+"$SCRIPT_DIR/{node}" "$SCRIPT_DIR/{script}" "$SCRIPT_DIR" "$@"
 """.format(
-    node = paths.relativize(node_exec, "bin"),
+    get_script_dir = GET_SCRIPT_DIR,
+    node = node_exec_relative,
     script = "node.js"))
   else:
     # Sets PATH for node, npm & yarn and run user script
     repository_ctx.file("bin/node.cmd", content="""
 @echo off
-SET CUR_DIR=%~dp0
-SET PATH=%CUR_DIR%;%PATH%
-CALL "%CUR_DIR%\\{node}" %*
-""".format(node = paths.relativize(node_exec, "bin")))
+SET SCRIPT_DIR=%~dp0
+SET PATH=%SCRIPT_DIR%;%PATH%
+CALL "%SCRIPT_DIR%\\{node}" %*
+""".format(node = node_exec_relative))
 
   # Shell script to set repository arguments for node used by nodejs_binary & nodejs_test launcher
   repository_ctx.file("bin/node_args.sh", content="""#!/bin/bash
@@ -245,47 +309,47 @@ export NODE_REPOSITORY_ARGS={}
     # Npm entry point
     repository_ctx.file("bin/npm", content="""#!/bin/bash
 #Generated by node_repositories.bzl
-CUR_DIR=$(dirname ${{BASH_SOURCE[0]}})
-"$CUR_DIR/{node}" "$CUR_DIR/{script}" --scripts-prepend-node-path=false "$@"
+{get_script_dir}
+"$SCRIPT_DIR/{node}" "$SCRIPT_DIR/{script}" --scripts-prepend-node-path=false "$@"
 """.format(
+    get_script_dir = GET_SCRIPT_DIR,
     node = paths.relativize(node_entry, "bin"),
-    script = paths.relativize(npm_script, "bin")),
+    script = npm_script_relative),
     executable = True)
     # Npm entry point for node_repositories
     repository_ctx.file("bin/npm_node_repositories", content="""#!/bin/bash
 #Generated by node_repositories.bzl
 #Executes the given npm command over each of the package.json folders provided in node_repositories.
 set -e
-CUR_DIR=$(dirname ${BASH_SOURCE[0]})
-""" + "".join(["""
+""" + GET_SCRIPT_DIR + "".join(["""
 echo Running npm "$@" in {root}
-(cd "{root}"; "$CUR_DIR/{node}" "$CUR_DIR/{script}" --scripts-prepend-node-path=false "$@")
+(cd "{root}"; "$SCRIPT_DIR/{node}" "$SCRIPT_DIR/{script}" --scripts-prepend-node-path=false "$@")
 """.format(
     root = repository_ctx.path(package_json).dirname,
     node = paths.relativize(node_entry, "bin"),
-    script = paths.relativize(npm_script, "bin"))
+    script = npm_script_relative)
     for package_json in repository_ctx.attr.package_json]), executable = True)
   else:
     # Npm entry point
     repository_ctx.file("bin/npm.cmd", content="""@echo off
-SET CUR_DIR=%~dp0
-"%CUR_DIR%\\{node}" "%CUR_DIR%\\{script}" --scripts-prepend-node-path=false %*
+SET SCRIPT_DIR=%~dp0
+"%SCRIPT_DIR%\\{node}" "%SCRIPT_DIR%\\{script}" --scripts-prepend-node-path=false %*
 """.format(
     node = paths.relativize(node_entry, "bin"),
-    script = paths.relativize(npm_script, "bin")),
+    script = npm_script_relative),
     executable = True)
     # Npm entry point for node_repositories
     repository_ctx.file("bin/npm_node_repositories.cmd", content="""@echo off
 """ + "".join(["""
-SET CUR_DIR=%~dp0
+SET SCRIPT_DIR=%~dp0
 echo Running npm %* in {root}
 cd "{root}"
-call "%CUR_DIR%\\{node}" "%CUR_DIR%\\{script}" --scripts-prepend-node-path=false %*
+call "%SCRIPT_DIR%\\{node}" "%SCRIPT_DIR%\\{script}" --scripts-prepend-node-path=false %*
 if %errorlevel% neq 0 exit /b %errorlevel%
 """.format(
     root = repository_ctx.path(package_json).dirname,
     node = paths.relativize(node_entry, "bin"),
-    script = paths.relativize(npm_script, "bin"))
+    script = npm_script_relative)
     for package_json in repository_ctx.attr.package_json]), executable = True)
 
   # This template file is used by the packager tool and the npm_package rule.
@@ -302,46 +366,45 @@ if %errorlevel% neq 0 exit /b %errorlevel%
     # Yarn entry point
     repository_ctx.file("bin/yarn", content="""#!/bin/bash
 #Generated by node_repositories.bzl
-CUR_DIR=$(dirname ${{BASH_SOURCE[0]}})
-"$CUR_DIR/{node}" "$CUR_DIR/{script}" "$@"
+{get_script_dir}
+"$SCRIPT_DIR/{node}" "$SCRIPT_DIR/{script}" "$@"
 """.format(
+    get_script_dir = GET_SCRIPT_DIR,
     node = paths.relativize(node_entry, "bin"),
-    script = paths.relativize(yarn_script, "bin")),
+    script = yarn_script_relative),
     executable = True)
     # Yarn entry point for node_repositories
     repository_ctx.file("bin/yarn_node_repositories", content="""#!/bin/bash
 #Generated by node_repositories.bzl
 #Executes the given yarn command over each of the package.json folders provided in node_repositories.
-set -e
-CUR_DIR=$(dirname ${BASH_SOURCE[0]})
-""" + "".join(["""
+set -e""" + GET_SCRIPT_DIR + "".join(["""
 echo Running yarn --cwd "{root}" "$@"
-"$CUR_DIR/{node}" "$CUR_DIR/{script}" --cwd "{root}" "$@"
+"$SCRIPT_DIR/{node}" "$SCRIPT_DIR/{script}" --cwd "{root}" "$@"
 """.format(
     root = repository_ctx.path(package_json).dirname,
     node = paths.relativize(node_entry, "bin"),
-    script = paths.relativize(yarn_script, "bin"))
+    script = yarn_script_relative)
     for package_json in repository_ctx.attr.package_json]), executable = True)
   else:
     # Yarn entry point
     repository_ctx.file("bin/yarn.cmd", content="""@echo off
-SET CUR_DIR=%~dp0
-"%CUR_DIR%\\{node}" "%CUR_DIR%\\{script}" %*
+SET SCRIPT_DIR=%~dp0
+"%SCRIPT_DIR%\\{node}" "%SCRIPT_DIR%\\{script}" %*
 """.format(
     node = paths.relativize(node_entry, "bin"),
-    script = paths.relativize(yarn_script, "bin")),
+    script = yarn_script_relative),
     executable = True)
     # Yarn entry point for node_repositories
     repository_ctx.file("bin/yarn_node_repositories.cmd", content="""@echo off
-SET CUR_DIR=%~dp0
+SET SCRIPT_DIR=%~dp0
 """ + "".join(["""
 echo Running yarn --cwd "{root}" %*
-CALL "%CUR_DIR%\\{node}" "%CUR_DIR%\\{script}" --cwd "{root}" %*
+CALL "%SCRIPT_DIR%\\{node}" "%SCRIPT_DIR%\\{script}" --cwd "{root}" %*
 if %errorlevel% neq 0 exit /b %errorlevel%
 """.format(
     root = repository_ctx.path(package_json).dirname,
     node = paths.relativize(node_entry, "bin"),
-    script = paths.relativize(yarn_script, "bin"))
+    script = yarn_script_relative)
     for package_json in repository_ctx.attr.package_json]), executable = True)
 
 def _nodejs_repo_impl(repository_ctx):
@@ -356,14 +419,13 @@ _nodejs_repo = repository_rule(
     # Options to override node version
     "node_version": attr.string(default = DEFAULT_NODE_VERSION),
     "yarn_version": attr.string(default = DEFAULT_YARN_VERSION),
-    "node_path": attr.string(),
-    "yarn_path": attr.string(),
+    "vendored_node": attr.label(allow_single_file = True),
+    "vendored_yarn": attr.label(allow_single_file = True),
     "node_repositories": attr.string_list_dict(default = NODE_REPOSITORIES),
     "yarn_repositories": attr.string_list_dict(default = YARN_REPOSITORIES),
     "node_urls": attr.string_list(default = NODE_URLS),
     "yarn_urls": attr.string_list(default = YARN_URLS),
-    # TODO: change preserve_symlinks default to true all issues with preserve-symlinks resolved
-    "preserve_symlinks": attr.bool(default = False),
+    "preserve_symlinks": attr.bool(default = True),
   },
 )
 
@@ -379,18 +441,17 @@ _yarn_repo = repository_rule(
   attrs = { "package_json": attr.label_list() }
 )
 
-# TODO: change preserve_symlinks default to true all issues with preserve-symlinks resolved
 def node_repositories(
   package_json=[],
   node_version=DEFAULT_NODE_VERSION,
   yarn_version=DEFAULT_YARN_VERSION,
-  node_path="",
-  yarn_path="",
+  vendored_node=None,
+  vendored_yarn=None,
   node_repositories=NODE_REPOSITORIES,
   yarn_repositories=YARN_REPOSITORIES,
   node_urls=NODE_URLS,
   yarn_urls=YARN_URLS,
-  preserve_symlinks=False):
+  preserve_symlinks=True):
   """To be run in user's WORKSPACE to install rules_nodejs dependencies.
 
   This rule sets up node, npm, and yarn.
@@ -405,7 +466,7 @@ def node_repositories(
   - Using a custom version:
     You can pass in a custom list of NodeJS and/or Yarn repositories and URLs for node_resositories to use.
   - Using a local version:
-    To avoid downloads, you can check in vendored copies of NodeJS and/or Yarn and set node_path and or yarn_path
+    To avoid downloads, you can check in vendored copies of NodeJS and/or Yarn and set vendored_node and or vendored_yarn
     to point to those before calling node_repositories.
 
   This rule exposes the `@nodejs` workspace containing some rules the user can call later:
@@ -442,9 +503,9 @@ def node_repositories(
 
     yarn_version: optional; the specific version of Yarn to install.
 
-    node_path: optional; the local path to a pre-installed NodeJS runtime.
+    vendored_node: optional; the local path to a pre-installed NodeJS runtime.
 
-    yarn_path: optional; the local path to a pre-installed yarn tool.
+    vendored_yarn: optional; the local path to a pre-installed yarn tool.
 
     node_repositories: optional; custom list of node repositories to use.
 
@@ -455,23 +516,24 @@ def node_repositories(
     yarn_urls: optional; custom list of URLs to use to download Yarn.
 
     preserve_symlinks: Turn on --node_options=--preserve-symlinks for nodejs_binary and nodejs_test rules.
-      The default for this is currently False but will be switched to True in the future. When this option is
-      turned on, node will preserve the symlinked path for resolves instead of the default behavior of resolving
-      to the real path. This means that all required files must be in be included in your runfiles as it
-      prevents the default behavior of potentially resolving outside of the runfiles. For example, all required
-      files need to be included in your node_modules filegroup. This option is desirable as it gives a stronger
-      guarantee of hermiticity which is required for remote execution.
+      The default for this is currently True but the options is deprecated and will be removed in the future.
+      When this option is turned on, node will preserve the symlinked path for resolves instead of the default
+      behavior of resolving to the real path. This means that all required files must be in be included in your
+      runfiles as it prevents the default behavior of potentially resolving outside of the runfiles. For example,
+      all required files need to be included in your node_modules filegroup. This option is desirable as it gives
+      a stronger guarantee of hermiticity which is required for remote execution.
   """
-  # @bazel_tools//tools/bash/runfiles is required for nodejs
-  check_bazel_version("0.14.0")
+  # 0.14.0: @bazel_tools//tools/bash/runfiles is required for nodejs
+  # 0.17.1: allow @ in package names is required for fine grained deps
+  check_bazel_version("0.17.1")
 
   _nodejs_repo(
     name = "nodejs",
     package_json = package_json,
     node_version = node_version,
     yarn_version = yarn_version,
-    node_path = node_path,
-    yarn_path = yarn_path,
+    vendored_node = vendored_node,
+    vendored_yarn = vendored_yarn,
     node_repositories = node_repositories,
     yarn_repositories = yarn_repositories,
     node_urls = node_urls,
@@ -496,4 +558,16 @@ def node_repositories(
       name = "build_bazel_rules_nodejs_rollup_deps",
       package_json = "@build_bazel_rules_nodejs//internal/rollup:package.json",
       yarn_lock = "@build_bazel_rules_nodejs//internal/rollup:yarn.lock",
+  )
+
+  yarn_install(
+      name = "history-server_runtime_deps",
+      package_json = "@build_bazel_rules_nodejs//internal/history-server:package.json",
+      yarn_lock = "@build_bazel_rules_nodejs//internal/history-server:yarn.lock",
+  )
+
+  yarn_install(
+      name = "http-server_runtime_deps",
+      package_json = "@build_bazel_rules_nodejs//internal/http-server:package.json",
+      yarn_lock = "@build_bazel_rules_nodejs//internal/http-server:yarn.lock",
   )
