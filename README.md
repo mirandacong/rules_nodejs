@@ -64,14 +64,20 @@ node_repositories(package_json = ["//:package.json"])
 You can choose a specific version of Node.js that's built into these rules.
 Currently these versions are:
 
+* 10.13.0 (default)
+* 10.10.0
+* 10.9.0
 * 10.3.0
 * 9.11.1
+* 8.12.0
 * 8.11.1
 * 8.9.1
 
 You can also choose a specific version of Yarn.
 Currently these versions are:
-
+* 1.12.1 (default)
+* 1.9.4
+* 1.9.2
 * 1.6.0
 * 1.5.1
 * 1.3.2
@@ -202,6 +208,13 @@ npm_install(
     package_lock_json = "//:package-lock.json",
 )
 ```
+
+#### yarn_install vs. npm_install
+
+`yarn_install` is the preferred rule for setting up Bazel-managed dependencies for a number of reasons:
+
+* `yarn_install` will use the global yarn cache by default which will improve your build performance (this can be turned off with the `use_global_yarn_cache` attribute)
+* npm has a known peer dependency hoisting issue that can lead to missing peer dependencies in some cases (see https://github.com/bazelbuild/rules_nodejs/issues/416)
 
 #### Fine-grained npm package dependencies
 

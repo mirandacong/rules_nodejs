@@ -24,7 +24,7 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 # It will be automatically synced via the npm "version" script
 # that is run when running `npm version` during the release
 # process. See `Releasing` section in README.md.
-VERSION = "0.15.3"
+VERSION = "0.16.2"
 
 def check_rules_nodejs_version(minimum_version_string):
     """
@@ -58,12 +58,9 @@ def rules_nodejs_dependencies():
     _maybe(
         http_archive,
         name = "bazel_skylib",
-        urls = [
-            "http://mirrors.corp.logiocean.com/file-store/bazel-skylib/0.3.1.zip",
-            "https://github.com/bazelbuild/bazel-skylib/archive/0.3.1.zip",
-        ],
-        strip_prefix = "bazel-skylib-0.3.1",
-        sha256 = "95518adafc9a2b656667bbf517a952e54ce7f350779d0dd95133db4eb5c27fb1",
+        url = "https://github.com/bazelbuild/bazel-skylib/archive/0.5.0.zip",
+        strip_prefix = "bazel-skylib-0.5.0",
+        sha256 = "ca4e3b8e4da9266c3a9101c8f4704fe2e20eb5625b2a6a7d2d7d45e3dd4efffd",
     )
 
     # Needed for Remote Build Execution
@@ -73,11 +70,11 @@ def rules_nodejs_dependencies():
     http_archive(
         name = "bazel_toolchains",
         urls = [
-            "https://mirror.bazel.build/github.com/bazelbuild/bazel-toolchains/archive/cdea5b8675914d0a354d89f108de5d28e54e0edc.tar.gz",
-            "https://github.com/bazelbuild/bazel-toolchains/archive/cdea5b8675914d0a354d89f108de5d28e54e0edc.tar.gz",
+            "https://mirror.bazel.build/github.com/bazelbuild/bazel-toolchains/archive/646207624ed58c9dc658a135e40e578f8bbabf64.tar.gz",
+            "https://github.com/bazelbuild/bazel-toolchains/archive/646207624ed58c9dc658a135e40e578f8bbabf64.tar.gz",
         ],
-        strip_prefix = "bazel-toolchains-cdea5b8675914d0a354d89f108de5d28e54e0edc",
-        sha256 = "cefb6ccf86ca592baaa029bcef04148593c0efe8f734542f10293ea58f170715",
+        strip_prefix = "bazel-toolchains-646207624ed58c9dc658a135e40e578f8bbabf64",
+        sha256 = "4ab012a06e80172b1d2cc68a69f12237ba2c4eb47ba34cb8099830d3b8c43dbc",
     )
 
 def rules_nodejs_dev_dependencies():
@@ -97,19 +94,16 @@ def rules_nodejs_dev_dependencies():
 
     http_archive(
         name = "io_bazel_rules_sass",
-        urls = [
-            "http://mirrors.corp.logiocean.com/file-store/rules_sass/1.11.0.zip",
-            "https://github.com/bazelbuild/rules_sass/archive/1.11.0.zip",
-        ],
-        strip_prefix = "rules_sass-1.11.0",
-        sha256 = "dbe9fb97d5a7833b2a733eebc78c9c1e3880f676ac8af16e58ccf2139cbcad03",
+        url = "https://github.com/bazelbuild/rules_sass/archive/1.15.0.zip",
+        strip_prefix = "rules_sass-1.15.0",
+        sha256 = "4584ae58ff33d958e184f3ccc2714cff271df28723fb63a54871b16c577bda24",
     )
 
     http_archive(
         name = "io_bazel_skydoc",
-        url = "https://github.com/bazelbuild/skydoc/archive/8632e30e7b1fa2d58f73ea0ef1f043b4b35794f5.zip",
-        strip_prefix = "skydoc-8632e30e7b1fa2d58f73ea0ef1f043b4b35794f5",
-        sha256 = "d8b663c41039dfd84f3ad26d04f9df3122af090f73816b3ffb8c0df660e1fc74",
+        url = "https://github.com/bazelbuild/skydoc/archive/77e5399258f6d91417d23634fce97d73b40cf337.zip",
+        strip_prefix = "skydoc-77e5399258f6d91417d23634fce97d73b40cf337",
+        sha256 = "4e9bd9ef65af54dedd997b408fa26c2e70c30ee8e078bcc1b51a33cf7d7f9d7e",
     )
 
     # Go is a transitive dependency of buildifier

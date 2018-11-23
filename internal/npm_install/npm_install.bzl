@@ -24,14 +24,77 @@ See discussion in the README.
 load("//internal/node:node_labels.bzl", "get_node_label", "get_npm_label", "get_yarn_label")
 load("//internal/common:os_name.bzl", "os_name")
 
+COMMON_ATTRIBUTES = dict(dict(), **{
+    "package_json": attr.label(
+        mandatory = True,
+        allow_single_file = True,
+    ),
+    "prod_only": attr.bool(
+        default = False,
+        doc = "Don't install devDependencies",
+    ),
+    "data": attr.label_list(),
+    "included_files": attr.string_list(
+        doc = """List of file extensions to be included in the npm package targets.
+
+        For example, [".js", ".d.ts", ".proto", ".json", ""].
+
+        This option is useful to limit the number of files that are inputs
+        to actions that depend on npm package targets. See
+        https://github.com/bazelbuild/bazel/issues/5153.
+
+        If set to an empty list then all files are included in the package targets.
+        If set to a list of extensions, only files with matching extensions are
+        included in the package targets. An empty string in the list is a special
+        string that denotes that files with no extensions such as `README` should
+        be included in the package targets.
+
+        This attribute applies to both the coarse `@wksp//:node_modules` target
+        as well as the fine grained targets such as `@wksp//foo`.""",
+        default = [],
+    ),
+    "exclude_packages": attr.string_list(
+        doc = """List of packages to exclude from install.
+
+        Use this when you want to install a package during manual yarn or npm
+        install but not install it when Bazel manages dependencies.
+
+        Note: this attribute may be removed in the future if bazel managed npm
+        dependencies are changed to install to the workspace `node_modules` folder
+        instead of `$(bazel info output_base)/external/wksp`.
+        """,
+        default = ["@bazel/bazel"],
+    ),
+    "manual_build_file_contents": attr.string(
+        doc = """Experimental attribute that can be used to override
+        the generated BUILD.bazel file and set its contents manually.
+        Can be used to work-around a bazel performance issue if the
+        default `@wksp//:node_modules` target has too many files in it.
+        See https://github.com/bazelbuild/bazel/issues/5153. If
+        you are running into performance issues due to a large
+        node_modules target it is recommended to switch to using
+        fine grained npm dependencies."""),
+    "quiet": attr.bool(
+        default = False,
+        doc = "If stdout and stderr should be printed to the terminal.",
+    ),
+})
+
 def _create_build_file(repository_ctx, node):
   if repository_ctx.attr.manual_build_file_contents:
     repository_ctx.file("manual_build_file_contents", repository_ctx.attr.manual_build_file_contents)
-  result = repository_ctx.execute([node, "generate_build_file.js"])
+  result = repository_ctx.execute([node, "generate_build_file.js", ",".join(repository_ctx.attr.included_files)])
   if result.return_code:
     fail("node failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (result.stdout, result.stderr))
 
-def _add_build_file_generator(repository_ctx):
+def _add_package_json(repository_ctx):
+  repository_ctx.symlink(
+      repository_ctx.attr.package_json,
+      repository_ctx.path("_package.json"))
+
+def _add_scripts(repository_ctx):
+  repository_ctx.template("process_package_json.js",
+    repository_ctx.path(Label("//internal/npm_install:process_package_json.js")), {})
   repository_ctx.template("generate_build_file.js",
     repository_ctx.path(Label("//internal/npm_install:generate_build_file.js")), {})
 
@@ -57,7 +120,7 @@ def _npm_install_impl(repository_ctx):
 
   # The entry points for npm install for osx/linux and windows
   if not is_windows:
-    repository_ctx.file("npm", content="""#!/bin/bash
+    repository_ctx.file("npm", content="""#!/usr/bin/env bash
 (cd "{root}"; "{npm}" {npm_args})
 """.format(
     root = repository_ctx.path(""),
@@ -73,22 +136,24 @@ cd "{root}" && "{npm}" {npm_args}
     npm_args = " ".join(npm_args)),
     executable = True)
 
-  # Put our package descriptors in the right place.
-  repository_ctx.symlink(
-      repository_ctx.attr.package_json,
-      repository_ctx.path("package.json"))
   if repository_ctx.attr.package_lock_json:
-      repository_ctx.symlink(
-          repository_ctx.attr.package_lock_json,
-          repository_ctx.path("package-lock.json"))
+    # Copy the file over instead of using a symlink since the lock file
+    # will be modified if there are excluded_packages
+    repository_ctx.template("package-lock.json",
+        repository_ctx.path(repository_ctx.attr.package_lock_json), {})
 
+  _add_package_json(repository_ctx)
   _add_data_dependencies(repository_ctx)
-  _add_build_file_generator(repository_ctx)
+  _add_scripts(repository_ctx)
 
-  # To see the output, pass: quiet=False
+  result = repository_ctx.execute([node, "process_package_json.js", ",".join(repository_ctx.attr.exclude_packages)])
+  if result.return_code:
+    fail("node failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (result.stdout, result.stderr))
+
   result = repository_ctx.execute(
     [repository_ctx.path("npm.cmd" if is_windows else "npm")],
-    timeout = repository_ctx.attr.timeout)
+    timeout = repository_ctx.attr.timeout,
+    quiet = repository_ctx.attr.quiet)
 
   if not repository_ctx.attr.package_lock_json:
     print("\n***********WARNING***********\n%s: npm_install will require a package_lock_json attribute in future versions\n*****************************" % repository_ctx.name)
@@ -110,35 +175,15 @@ cd "{root}" && "{npm}" {npm_args}
   _create_build_file(repository_ctx, node)
 
 npm_install = repository_rule(
-    attrs = {
-        "package_json": attr.label(
-            allow_files = True,
-            mandatory = True,
-            single_file = True,
-        ),
+    attrs = dict(COMMON_ATTRIBUTES, **{
         "package_lock_json": attr.label(
-            allow_files = True,
-            single_file = True,
+            allow_single_file = True,
         ),
-        "prod_only": attr.bool(
-            default = False,
-            doc = "Don't install devDependencies",
-        ),
-        "data": attr.label_list(),
-        "manual_build_file_contents": attr.string(
-            doc = """Experimental attribute that can be used to override
-            the generated BUILD.bazel file and set its contents manually.
-            Can be used to work-around a bazel performance issue if the
-            default node_modules filegroup has too many files in it. See
-            https://github.com/bazelbuild/bazel/issues/5153. If
-            you are running into performance issues due to a large
-            node_modules filegroup it is recommended to switch to using
-            fine grained npm dependencies."""),
         "timeout": attr.int(
             default = 600,
             doc = """Maximum duration of the command "npm install" in seconds
             (default is 600 seconds)."""),
-    },
+    }),
     implementation = _npm_install_impl,
 )
 """Runs npm install during workspace setup.
@@ -147,44 +192,50 @@ npm_install = repository_rule(
 def _yarn_install_impl(repository_ctx):
   """Core implementation of yarn_install."""
 
-  # Put our package descriptors in the right place.
-  repository_ctx.symlink(
-      repository_ctx.attr.package_json,
-      repository_ctx.path("package.json"))
-  if repository_ctx.attr.yarn_lock:
-      repository_ctx.symlink(
-          repository_ctx.attr.yarn_lock,
-          repository_ctx.path("yarn.lock"))
-
-  _add_data_dependencies(repository_ctx)
-  _add_build_file_generator(repository_ctx)
-
   node = repository_ctx.path(get_node_label(repository_ctx))
   yarn = get_yarn_label(repository_ctx)
 
-  # Multiple yarn rules cannot run simultaneously using a shared cache.
-  # See https://github.com/yarnpkg/yarn/issues/683
-  # The --mutex option ensures only one yarn runs at a time, see
-  # https://yarnpkg.com/en/docs/cli#toc-concurrency-and-mutex
-  # The shared cache is not necessarily hermetic, but we need to cache downloaded
-  # artifacts somewhere, so we rely on yarn to be correct.
-  # To see the output, pass: quiet=False
+  if repository_ctx.attr.yarn_lock:
+    # Copy the file over instead of using a symlink since the lock file
+    # will be modified if there are excluded_packages
+    repository_ctx.template("yarn.lock",
+        repository_ctx.path(repository_ctx.attr.yarn_lock), {})
+
+  _add_package_json(repository_ctx)
+  _add_data_dependencies(repository_ctx)
+  _add_scripts(repository_ctx)
+
+  result = repository_ctx.execute([node, "process_package_json.js", ",".join(repository_ctx.attr.exclude_packages)])
+  if result.return_code:
+    fail("node failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (result.stdout, result.stderr))
+
   args = [
     repository_ctx.path(yarn),
-    "--mutex",
-    "network",
     "--cwd",
     repository_ctx.path(""),
+    "--network-timeout",
+    str(repository_ctx.attr.timeout*1000), # in ms
   ]
 
   if repository_ctx.attr.prod_only:
       args.append("--prod")
   if not repository_ctx.attr.use_global_yarn_cache:
       args.extend(["--cache-folder", repository_ctx.path("_yarn_cache")])
+  else:
+      # Multiple yarn rules cannot run simultaneously using a shared cache.
+      # See https://github.com/yarnpkg/yarn/issues/683
+      # The --mutex option ensures only one yarn runs at a time, see
+      # https://yarnpkg.com/en/docs/cli#toc-concurrency-and-mutex
+      # The shared cache is not necessarily hermetic, but we need to cache downloaded
+      # artifacts somewhere, so we rely on yarn to be correct.
+      args.extend(["--mutex", "network"])
 
   # This can take a long time, and the user has no idea what is running.
   # Follow https://github.com/bazelbuild/bazel/issues/1289
-  result = repository_ctx.execute(args, timeout = repository_ctx.attr.timeout)
+  result = repository_ctx.execute(
+    args,
+    timeout = repository_ctx.attr.timeout,
+    quiet = repository_ctx.attr.quiet)
 
   if result.return_code:
     fail("yarn_install failed: %s (%s)" % (result.stdout, result.stderr))
@@ -192,31 +243,11 @@ def _yarn_install_impl(repository_ctx):
   _create_build_file(repository_ctx, node)
 
 yarn_install = repository_rule(
-    attrs = {
-        "package_json": attr.label(
-            allow_files = True,
-            mandatory = True,
-            single_file = True,
-        ),
+    attrs = dict(COMMON_ATTRIBUTES, **{
         "yarn_lock": attr.label(
-            allow_files = True,
             mandatory = True,
-            single_file = True,
+            allow_single_file = True,
         ),
-        "prod_only": attr.bool(
-            default = False,
-            doc = "Don't install devDependencies",
-        ),
-        "data": attr.label_list(),
-        "manual_build_file_contents": attr.string(
-            doc = """Experimental attribute that can be used to override
-            the generated BUILD.bazel file and set its contents manually.
-            Can be used to work-around a bazel performance issue if the
-            default node_modules filegroup has too many files in it. See
-            https://github.com/bazelbuild/bazel/issues/5153. If
-            you are running into performance issues due to a large
-            node_modules filegroup it is recommended to switch to using
-            fine grained npm dependencies."""),
         "use_global_yarn_cache": attr.bool(
             default = True,
             doc = """Use the global yarn cache on the system.
@@ -230,7 +261,7 @@ yarn_install = repository_rule(
             default = 600,
             doc = """Maximum duration of the command "yarn" in seconds.
             (default is 600 seconds)."""),
-    },
+    }),
     implementation = _yarn_install_impl,
 )
 """Runs yarn install during workspace setup.
