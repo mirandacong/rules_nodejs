@@ -5,6 +5,7 @@ const nodeResolve = require('rollup-plugin-node-resolve');
 const sourcemaps = require('rollup-plugin-sourcemaps');
 const amd = require('rollup-plugin-amd');
 const commonjs = require('rollup-plugin-commonjs');
+const json = require('rollup-plugin-json');
 const isBuiltinModule = require('is-builtin-module');
 const path = require('path');
 const fs = require('fs');
@@ -189,12 +190,16 @@ const config = {
       include: /\.ngfactory\.js$/i,
     }),
     commonjs(),
+    json(),
     {
       name: 'notResolved',
       resolveId: notResolved,
     },
     sourcemaps(),
   ]),
+  // external: [
+  //   'url', 'http', 'https', 'zlib', 'stream', 'buffer', 'string_decoder', 'util$3', 'child_process', 'fs', 'path$1'
+  // ],
   output: {
     banner,
     format: 'TMPL_output_format',
