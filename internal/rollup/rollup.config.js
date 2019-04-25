@@ -189,7 +189,12 @@ const config = {
       // with the amd plugin.
       include: /\.ngfactory\.js$/i,
     }),
-    commonjs(),
+    commonjs({
+      namedExports: {
+        'external/npm/node_modules/sprintf-js/src/sprintf.js': ['sprintf', 'vsprintf'],
+        'external/npm/node_modules/railroad-diagrams/railroad-diagrams.js': ['Diagram', 'ComplexDiagram', 'Sequence', 'Choice', 'Optional', 'OneOrMore', 'ZeroOrMore', 'Terminal', 'NonTerminal', 'Comment', 'Skip'],
+      }
+    }),
     json(),
     {
       name: 'notResolved',
