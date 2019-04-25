@@ -190,10 +190,7 @@ const config = {
       include: /\.ngfactory\.js$/i,
     }),
     commonjs({
-      namedExports: {
-        'external/npm/node_modules/sprintf-js/src/sprintf.js': ['sprintf', 'vsprintf'],
-        'external/npm/node_modules/railroad-diagrams/railroad-diagrams.js': ['Diagram', 'ComplexDiagram', 'Sequence', 'Choice', 'Optional', 'OneOrMore', 'ZeroOrMore', 'Terminal', 'NonTerminal', 'Comment', 'Skip'],
-      }
+      namedExports: TMPL_named_exports,
     }),
     json(),
     {
@@ -202,9 +199,6 @@ const config = {
     },
     sourcemaps(),
   ]),
-  // external: [
-  //   'url', 'http', 'https', 'zlib', 'stream', 'buffer', 'string_decoder', 'util$3', 'child_process', 'fs', 'path$1'
-  // ],
   output: {
     banner,
     format: 'TMPL_output_format',
