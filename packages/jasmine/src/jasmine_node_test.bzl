@@ -53,11 +53,11 @@ def jasmine_node_test(
         tags = tags,
     )
 
-    all_data = data + srcs + deps + [jasmine]
+    all_data = data + srcs + deps + [jasmine] + ['@npm_bazel_jasmine//src:jasmine_runner']
 
     all_data += [":%s_devmode_srcs.MF" % name]
     all_data += [Label("@bazel_tools//tools/bash/runfiles")]
-    entry_point = "@bazel/jasmine/src/jasmine_runner.js"
+    entry_point = "npm_bazel_jasmine/src/jasmine_runner.js"
 
     templated_args = ["$(location :%s_devmode_srcs.MF)" % name]
     if coverage:
