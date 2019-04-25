@@ -165,9 +165,9 @@ def _nodejs_binary_impl(ctx):
 
     files = [node, ctx.outputs.loader, ctx.file._repository_args] + ctx.files._node_runfiles
 
-    if ctx.attr.config != None:
-        files += [ctx.file.config]
-        substitutions["TEMPLATED_args"] += " " + ctx.attr.config.files.to_list()[0].path
+    if ctx.attr.jasmine_config != None:
+        files += [ctx.file.jasmine_config]
+        substitutions["TEMPLATED_args"] += " " + ctx.attr.jasmine_config.files.to_list()[0].path
 
     ctx.actions.expand_template(
         template = ctx.file._launcher_template,
@@ -204,7 +204,7 @@ _NODEJS_EXECUTABLE_ATTRS = {
         """,
         default = [],
     ),
-    "config": attr.label(
+    "jasmine_config": attr.label(
         doc = """The configuration path of jasmine""",
         allow_files = True,
         single_file = True
